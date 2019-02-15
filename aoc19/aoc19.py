@@ -44,6 +44,8 @@ print "=== Num Molecules = {}".format(len(newMolecules))
 print "============="
 
 #### Part 2 ###
+
+'''
 lastMolecules = ["e"]
 
 moleculeFound = False
@@ -66,10 +68,21 @@ while not moleculeFound:
     lastMolecules = nextMolecules.keys()
 
     steps += 1
+'''
+
+numMatches = 0
+for idx,r1 in enumerate(replacements):
+    for r2 in replacements[0:idx]+replacements[idx+1:]:
+        if re.search(r2[1],r1[1]):
+            numMatches+=1
+            print "match:"
+            print r1
+            print r2
+assert numMatches == 0, "part 2 only works if reverse mappings are unique"
 
 print "============="
 print "=== Part 2"
-print "Num Steps = {}".format(steps)
+print "Num Steps = {}".format(0)
 
 
 
