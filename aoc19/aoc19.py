@@ -3,6 +3,7 @@
 import sys
 import re
 import copy
+import random 
 
 assert len(sys.argv) == 2, sys.argv[0] + " requires 1 argument!"
 
@@ -14,6 +15,33 @@ def getNewMolecules(m, repl):
                 newM = m[0:idx] + r[1] + m[idx+len(r[0]):]
                 newMoleculeDict[newM] = 1
     return newMoleculeDict.keys()
+
+def getNewMoleculesRev(m, repl):
+    newMoleculeDict = {}
+    for r in repl:
+        for idx in range(len(m)):
+            if m[idx:idx+len(r[1])] == r[1]:
+                newM = m[0:idx] + r[0] + m[idx+len(r[1]):]
+                newMoleculeDict[newM] = 1
+    return newMoleculeDict.keys()
+
+
+def decompose(decomps, currMole, currSteps, repl, idxStack):
+    print idxStack
+    if currMole == "e":
+        decomps.append(currSteps)
+    else:
+        for r in repl:
+            for idx in range(len(currMole)):
+                if currMole[idx:idx+len(r[1])] == r[1]:
+                    decompose(decomps, currMole[0:idx] + r[0] + currMole[idx+len(r[1]):], currSteps+1, repl, idxStack + [idx])
+
+def decomposeSteps(m, repl):
+    decompositions = []
+
+    decompose(decompositions, m, 0, repl, [])
+
+    return min(decompositions)
 
 
 replacements = []
@@ -45,44 +73,37 @@ print "============="
 
 #### Part 2 ###
 
-'''
-lastMolecules = ["e"]
+#steps = decomposeSteps(molecule, replacements)
 
 moleculeFound = False
+attempt = 1
 steps = 0
+currMole = molecule
 while not moleculeFound:
-    print "--- Step {} = {}".format(steps, len(lastMolecules))
-    #for m in lastMolecules:
-    #    print m
+    lastMole = currMole
 
-    assert len(lastMolecules) != 0, "ran out of molecules!"
+    for r in replacements:
+        if r[1] in currMole:
+            #print currMole,
+            #print "->",
+            currMole = currMole.replace(r[1], r[0], 1)
+            #print currMole
+            steps += 1
 
-    nextMolecules = {}
-    for m in lastMolecules:
-        for mNew in getNewMolecules(m,replacements):
-            if len(mNew) < len(molecule):
-                nextMolecules[mNew] = True
-            elif len(mNew) == len(molecule):
-                moleculeFound = (mNew == molecule) or moleculeFound
+    if lastMole == currMole:
+        print "Attempt = {}  (ended with: {})".format(attempt, currMole)
+        currMole = molecule
+        random.shuffle(replacements)
+        steps = 0
+        attempt+=1
 
-    lastMolecules = nextMolecules.keys()
+    if currMole == "e":
+        moleculeFound = True
 
-    steps += 1
-'''
-
-numMatches = 0
-for idx,r1 in enumerate(replacements):
-    for r2 in replacements[0:idx]+replacements[idx+1:]:
-        if re.search(r2[1],r1[1]):
-            numMatches+=1
-            print "match:"
-            print r1
-            print r2
-assert numMatches == 0, "part 2 only works if reverse mappings are unique"
 
 print "============="
 print "=== Part 2"
-print "Num Steps = {}".format(0)
+print "Num Steps = {}".format(steps)
 
 
 
