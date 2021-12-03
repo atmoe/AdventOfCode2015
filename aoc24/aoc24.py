@@ -73,7 +73,7 @@ def getQE(group):
 print("==============")
 print("=== Part 1 ===")
 print("==============")
-doPart1 = False
+doPart1 = True
 if doPart1:
     groups = []
     initialGroup = []
